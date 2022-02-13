@@ -9,17 +9,19 @@
             <nuxt-link v-else to="/login">Have an account?</nuxt-link>
           </p>
           <ul class="error-messages">
-            <li>That email is invalid.</li>
+            <template v-for="(messages, field) in errors">
+              <li v-for="(message, index) in messages" :key="index">{{field}} {{message}}</li>
+            </template>
           </ul>
           <form @submit.prevent="onSubmit">
             <fieldset v-if="!isLogin" class="form-group">
               <input class="form-control form-control-lg" type="text" placeholder="Your Name">
             </fieldset>
             <fieldset class="form-group">
-              <input class="form-control form-control-lg" type="email" placeholder="Email" v-model="user.email">
+              <input class="form-control form-control-lg" type="email" placeholder="Email" v-model="user.email" required>
             </fieldset>
             <fieldset class="form-group">
-              <input class="form-control form-control-lg" type="password" placeholder="Password" v-model="user.password">
+              <input class="form-control form-control-lg" type="password" placeholder="Password" v-model="user.password" required>
             </fieldset>
             <button class="btn btn-lg btn-primary pull-xs-right">
               {{ isLogin ? 'Sign in' : 'Sign up' }}
@@ -41,6 +43,7 @@ export default {
         email: '',
         password: '',
       },
+      errors: {},
     }
   },
   computed: {
@@ -52,12 +55,17 @@ export default {
   mounted() {},
   methods: {
     async onSubmit() {
-      // 提交表单
-      const { data } = await login({
-          user: this.user
-      })
-      // 登录成功跳转到首页
-      this.$router.push('/')
+      try {
+        // 提交表单
+        const { data } = await login({
+          user: this.user,
+        })
+        cnsole.log(data)
+        // 登录成功跳转到首页
+        this.$router.push('/')
+      } catch (error) {
+        this.errors = error.response.data.errors
+      }
     },
   },
 }
