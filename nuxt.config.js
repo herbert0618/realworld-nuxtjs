@@ -23,6 +23,26 @@ module.exports = {
               path: 'register', // 注册子路由
               name: 'register',
               component: resolve(__dirname, 'pages/login/')
+            },
+            {
+              path: 'profile/:username', // 注册子路由  动态路由
+              name: 'profile',
+              component: resolve(__dirname, 'pages/profile/')
+            },
+            {
+              path: 'settings', // 注册子路由  动态路由
+              name: 'settings',
+              component: resolve(__dirname, 'pages/settings/')
+            },
+            {
+              path: 'editor',
+              name: 'editor',
+              component: resolve(__dirname, 'pages/editor/')
+            },
+            {
+              path: 'article/:slug',
+              name: 'article',
+              component: resolve(__dirname, 'pages/article/')
             }
           ]
         }
