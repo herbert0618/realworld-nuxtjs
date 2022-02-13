@@ -1,6 +1,7 @@
 module.exports = {
   // 自定义路由规则
   router: {
+    linkActiveClass: 'active',
     extendRoutes(routes, resolve) {
       // 清除nuxtjs 基于pages默认生成路由表
       routes.splice(0)
