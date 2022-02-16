@@ -80,6 +80,7 @@
 
 <script>
 export default {
+  middleware: 'authenticed',
   name: 'userProfile',
   props: {},
   data() {

@@ -37,6 +37,8 @@ profile picture">
 
 <script>
 export default {
+  middleware: 'authenticed',
+  name: 'settings',
   props: {},
   data() {
     return {}

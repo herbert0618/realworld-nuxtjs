@@ -34,6 +34,8 @@ tags">
 
 <script>
 export default {
+  // 在匹配路由之前先匹配中间件
+  middleware: 'authenticed',
   name: 'eiditor',
   props: {},
   data() {
