@@ -52,11 +52,7 @@
           </div>
           <nav>
             <ul class="pagination">
-              <li class="page-item"
-               v-for=" item in totalPage" 
-               :key="item"
-               :class="item === page ? 'active' : ''"
-               >
+              <li class="page-item" v-for=" item in totalPage" :key="item" :class="item === page ? 'active' : ''">
                 <nuxt-link class="page-link" :to="{name:'home',query:{page:item}}">{{ item }}</nuxt-link>
               </li>
             </ul>
@@ -86,17 +82,21 @@ export default {
   async asyncData({ query }) {
     const page = Number.parseInt(query.page || 1)
     const limit = 2
-    const { data } = await getArticles({
-      limit, // 每页大小
-      offset: (page - 1) * limit,
-    })
-    const { data : tagData } = await getTags()
+    const [ articleRes, tagRes ] = await Promise.all([
+      getArticles({
+        limit, // 每页大小
+        offset: (page - 1) * limit,
+      }),
+      getTags()
+    ])
+    const { articles, articlesCount } = articleRes.data
+    const { tags } = tagRes.data
     return {
       limit,
       page,
-      articles: data.articles,
-      articlesCount: data.articlesCount,
-      tags:tagData.tags
+      articles,
+      articlesCount,
+      tags
     }
   },
   data() {
