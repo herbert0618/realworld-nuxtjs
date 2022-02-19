@@ -53,7 +53,16 @@
           <nav>
             <ul class="pagination">
               <li class="page-item" v-for=" item in totalPage" :key="item" :class="item === page ? 'active' : ''">
-                <nuxt-link class="page-link" :to="{name:'home',query:{page:item}}">{{ item }}</nuxt-link>
+                <nuxt-link 
+                class="page-link" 
+                :to="{
+                  name:'home',
+                  query: {
+                    page: item,
+                    tag: $route.query.tag
+                  }
+                }"
+                >{{ item }}</nuxt-link>
               </li>
             </ul>
           </nav>
@@ -62,7 +71,16 @@
           <div class="sidebar">
             <p>Popular Tags</p>
             <div class="tag-list">
-              <a href="" class="tag-pill tag-default" v-for="item in tags" :key="item">{{ item }}</a>
+              <nuxt-link 
+              :to ="{
+                name:'home',
+                 query: { 
+                   tag: item 
+                 }
+              }" 
+              class="tag-pill tag-default" 
+              v-for="item in tags" :key="item"
+              >{{ item }}</nuxt-link>
             </div>
           </div>
         </div>
@@ -78,7 +96,7 @@ import { getTags } from '@/api/tag'
 export default {
   name: 'HomeIndex',
   props: {},
-  watchQuery: ['page'],
+  watchQuery: ['page', 'tag'],
   async asyncData({ query }) {
     const page = Number.parseInt(query.page || 1)
     const limit = 2
