@@ -12,13 +12,35 @@
           <div class="feed-toggle">
             <ul class="nav nav-pills outline-active">
               <li class="nav-item" v-if="user">
-                <a class="nav-link disabled" href="">Your Feed</a>
+                <nuxt-link exact class="nav-link" :class="{
+                    active: tab === 'your_feed'
+                  }" :to="{
+                    name:'home',
+                    query:{
+                      tab:'your_feed'
+                    }
+                  }">Your Feed</nuxt-link>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="">Global Feed</a>
+                <nuxt-link exact class="nav-link" :class="{
+                    active: tab === 'global_feed'
+                  }" :to="{
+                    name:'home',
+                    query:{
+                      tab:'global_feed'
+                    }
+                  }">Global Feed</nuxt-link>
               </li>
-               <li class="nav-item" v-if='tag'>
-                <a class="nav-link active" href="">#{{ tag }}</a>
+              <li class="nav-item" v-if='tag'>
+              <li class="nav-item">
+                <nuxt-link v-if="tag" exact class="nav-link" :class="{
+                      active: tab === tag
+                        }" :to="{
+                      name:'home',
+                      query:{
+                        tab:tag
+                      }
+                    }">#{{ tag }}</nuxt-link>
               </li>
             </ul>
           </div>
@@ -40,32 +62,30 @@
               </button>
             </div>
             <nuxt-link :to="{
-            name: 'article',
-            params: {
-            slug: article.slug
-            }}" class="preview-link">
+              name: 'article',
+              params: {
+              slug: article.slug
+              }}" class="preview-link">
               <h1>{{ article.title }}</h1>
               <p>{{ article.description }}</p>
               <span @click="$router.push({
-            name: 'article',
-            params: {
-            slug: article.slug
-            }})">Read more...</span>
+                name: 'article',
+                params: {
+                slug: article.slug
+              }})">Read more...</span>
             </nuxt-link>
           </div>
           <nav>
             <ul class="pagination">
               <li class="page-item" v-for=" item in totalPage" :key="item" :class="item === page ? 'active' : ''">
-                <nuxt-link 
-                class="page-link" 
-                :to="{
+                <nuxt-link class="page-link" :to="{
                   name:'home',
                   query: {
                     page: item,
-                    tag: $route.query.tag
+                    tag: $route.query.tag,
+                    tab: tab
                   }
-                }"
-                >{{ item }}</nuxt-link>
+                }">{{ item }}</nuxt-link>
               </li>
             </ul>
           </nav>
@@ -74,16 +94,13 @@
           <div class="sidebar">
             <p>Popular Tags</p>
             <div class="tag-list">
-              <nuxt-link 
-              :to ="{
+              <nuxt-link :to="{
                 name:'home',
-                 query: { 
+                 query: {
+                   tab: 'tag',
                    tag: item 
                  }
-              }" 
-              class="tag-pill tag-default" 
-              v-for="item in tags" :key="item"
-              >{{ item }}</nuxt-link>
+              }" class="tag-pill tag-default" v-for="item in tags" :key="item">{{ item }}</nuxt-link>
             </div>
           </div>
         </div>
@@ -94,23 +111,28 @@
 
 <script>
 import { mapState } from 'vuex'
-import { getArticles } from '@/api/article'
+import { getArticles, getFeedArticles } from '@/api/article'
 import { getTags } from '@/api/tag'
 
 export default {
   name: 'HomeIndex',
   props: {},
-  watchQuery: ['page', 'tag'],
-  async asyncData({ query }) {
+  watchQuery: ['page', 'tag', 'tab'],
+  async asyncData({ query, store }) {
     const page = Number.parseInt(query.page || 1)
     const limit = 2
     const { tag } = query
-    const [ articleRes, tagRes ] = await Promise.all([
-      getArticles({
+    const tab = query.tab || 'global_feed'
+    const loadArticles = store.state.user && tab === 
+    'your_feed' 
+      ? getFeedArticles 
+      : getArticles
+    const [articleRes, tagRes] = await Promise.all([
+      loadArticles({
         limit, // 每页大小
         offset: (page - 1) * limit,
       }),
-      getTags()
+      getTags(),
     ])
     const { articles, articlesCount } = articleRes.data
     const { tags } = tagRes.data
@@ -120,7 +142,8 @@ export default {
       articles,
       articlesCount,
       tags,
-      tag
+      tag,
+      tab: query.tab || 'global_feed',
     }
   },
   data() {
@@ -130,7 +153,7 @@ export default {
     totalPage() {
       return Math.ceil(this.articlesCount / this.limit)
     },
-    ...mapState(['user'])
+    ...mapState(['user']),
   },
   created() {},
   mounted() {},
