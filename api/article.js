@@ -26,7 +26,14 @@ export const addFavorite = slug =>{
   //取消点赞
 export const deleteFavorite = slug =>{
   return request({
-    method: 'delete',
+    method: 'DELETE',
     url: `/api/articles/${slug}/favorite`
+  })
+ }
+// 获取我文章详情
+export const getArticle = slug =>{
+  return request({
+    method: 'GET',
+    url: `/api/articles/${slug}`
   })
  }
