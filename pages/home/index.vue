@@ -55,7 +55,7 @@
                 <nuxt-link class="author" :to="`/profile/${article.author.username}`">
                   {{ article.author.username }}
                 </nuxt-link>
-                <span class="date">{{ article.createdAt }}</span>
+                <span class="date">{{ article.createdAt | date('MMM DD, YYYY') }}</span>
               </div>
               <button class="btn btn-outline-primary btn-sm pull-xs-right" :class="{ active: article.favorited }">
                 <i class="ion-heart"></i> {{ article.favoritesCount }}
