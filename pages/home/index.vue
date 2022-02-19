@@ -57,7 +57,13 @@
                 </nuxt-link>
                 <span class="date">{{ article.createdAt | date('MMM DD, YYYY') }}</span>
               </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right" :class="{ active: article.favorited }">
+              <button 
+                class="btn btn-outline-primary 
+                btn-sm pull-xs-right" 
+                :class="{ active: article.favorited }" 
+                @click="onFavorite(article)"
+                :disabled = "article.favoriteDisabled"
+              >
                 <i class="ion-heart"></i> {{ article.favoritesCount }}
               </button>
             </div>
@@ -111,7 +117,12 @@
 
 <script>
 import { mapState } from 'vuex'
-import { getArticles, getFeedArticles } from '@/api/article'
+import {
+  getArticles,
+  getFeedArticles,
+  addFavorite,
+  deleteFavorite,
+} from '@/api/article'
 import { getTags } from '@/api/tag'
 
 export default {
@@ -123,10 +134,8 @@ export default {
     const limit = 2
     const { tag } = query
     const tab = query.tab || 'global_feed'
-    const loadArticles = store.state.user && tab === 
-    'your_feed' 
-      ? getFeedArticles 
-      : getArticles
+    const loadArticles =
+      store.state.user && tab === 'your_feed' ? getFeedArticles : getArticles
     const [articleRes, tagRes] = await Promise.all([
       loadArticles({
         limit, // 每页大小
@@ -136,6 +145,7 @@ export default {
     ])
     const { articles, articlesCount } = articleRes.data
     const { tags } = tagRes.data
+    articles.forEach((article) => (article.favoriteDisabled = false))
     return {
       limit,
       page,
@@ -157,7 +167,23 @@ export default {
   },
   created() {},
   mounted() {},
-  methods: {},
+  methods: {
+    async onFavorite(article) {
+      article.favoriteDisabled = true
+      if (article.favorited) {
+        // 取消点赞
+        await deleteFavorite(article.slug)
+        article.favorited = false
+        article.favoritesCount += -1
+      } else {
+        // 添加点赞
+        await addFavorite(article.slug)
+        article.favorited = true
+        article.favoritesCount += 1
+      }
+      article.favoriteDisabled = false
+    },
+  },
 }
 </script>
 
