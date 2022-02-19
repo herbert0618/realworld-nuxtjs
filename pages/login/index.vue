@@ -68,11 +68,10 @@ export default {
           : await register({
               user: this.user,
             })
-        console.log('data: ', data);
         this.$store.commit('setUser', data.user)
        
        // 为了防止刷新页面数据丢失， 我们需要把数据持久化
-       cookie.set('user', data.user)
+       cookie.set('user', JSON.stringify(data.user))
 
         // 登录成功跳转到首页
         this.$router.push('/')
