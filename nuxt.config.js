@@ -50,6 +50,10 @@ module.exports = {
       ])
     }
   },
+  server: {
+    host: '0.0.0.0', // localhost zhi 能本地访问
+    port: 3000
+  },
   // 注册插件
   plugins: [
     '~/plugins/request.js',
